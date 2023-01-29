@@ -144,7 +144,7 @@ struct ple_optional list_get_last(const struct linked_list* list){
     return ple_of(find_last(list)->value);
 }
 
-struct linked_list* list_map(struct linked_list* list, list_map_function function){
+struct linked_list* list_map(const struct linked_list* list, list_map_function function){
     if (!list) {
         return NULL;
     }
@@ -183,7 +183,7 @@ void list_modifying_for_each(struct linked_list* list, list_modifying_for_each_f
     }
 }
 
-bool list_any(struct linked_list* list, list_predicate_func func, void* external_param) {
+bool list_any(const struct linked_list* list, list_predicate_func func, void* external_param) {
     if (!list) {
         return false;
     }
@@ -197,7 +197,7 @@ bool list_any(struct linked_list* list, list_predicate_func func, void* external
     return false;
 }
 
-bool list_all(struct linked_list* list, list_predicate_func func, void* external_param) {
+bool list_all(const struct linked_list* list, list_predicate_func func, void* external_param) {
     if (!list) {
         return false;
     }
@@ -211,3 +211,10 @@ bool list_all(struct linked_list* list, list_predicate_func func, void* external
     return true;
 }
 
+static union parametric_list_element copy_function(union parametric_list_element element) {
+    return element;
+}
+
+struct linked_list* list_copy(const struct linked_list* list) {
+    return list_map(list, copy_function);
+}
