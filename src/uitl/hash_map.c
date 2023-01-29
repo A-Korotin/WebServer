@@ -137,7 +137,8 @@ struct ple_optional hash_map_get(const struct hash_map* map, const char *key) {
     return PLE_EMPTY;
 }
 
+
 struct linked_list* hash_map_get_entries(const struct hash_map* map) {
-    return NULL;
+    return list_copy(map->entries);
 }
 
