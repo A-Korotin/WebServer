@@ -1,16 +1,13 @@
 #include <stdio.h>
 
-#include "linked_list.h"
+#include "hash_map.h"
 
-void for_each(union parametric_datastructure_element element) {
+void for_each(union parametric_list_element element) {
     printf("%zu ", element.as_size_t);
 }
 
-union parametric_datastructure_element map_func(union parametric_datastructure_element element) {
-    return (union parametric_datastructure_element) {.as_size_t=++element.as_size_t};
-}
 
-void print_optional_as_size_t(struct pde_optional element) {
+void print_optional_as_size_t(struct ple_optional element) {
     if (!element.exists) {
         puts("EMPTY");
         return;
@@ -19,15 +16,10 @@ void print_optional_as_size_t(struct pde_optional element) {
 }
 
 int main() {
-    size_t iter = 0;
-    struct linked_list* list = list_create(pde_from_size_t(iter++));
-
-    for (; iter < 10; ++iter) {
-        list = list_push_back(list, pde_from_size_t(iter));
-    }
-
-    list = list_insert_at_index(list, 1, pde_from_size_t(10));
-
-    list_for_each(list, for_each);
+    struct hash_map* map = hash_map_create(128);
+    hash_map_put(map, "key1", ple_from_size_t(10));
+    hash_map_put(map, "1key", ple_from_size_t(20));
+    struct ple_optional anOptional = hash_map_get(map, "1key");
+    print_optional_as_size_t(anOptional);
     return 0;
 }
