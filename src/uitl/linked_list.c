@@ -9,7 +9,7 @@
 
 struct linked_list {
     struct linked_list* next;
-    union parametric_datastructure_element value;
+    union parametric_list_element value;
 };
 
 size_t list_size(const struct linked_list* list) {
@@ -22,7 +22,7 @@ size_t list_size(const struct linked_list* list) {
     return size;
 }
 
-static struct linked_list* init_node(union parametric_datastructure_element value) {
+static struct linked_list* init_node(union parametric_list_element value) {
     struct linked_list* list = malloc(sizeof (struct linked_list));
     list->next = NULL;
     list->value = value;
@@ -30,7 +30,7 @@ static struct linked_list* init_node(union parametric_datastructure_element valu
     return list;
 }
 
-struct linked_list* list_create(union parametric_datastructure_element initial) {
+struct linked_list* list_create(union parametric_list_element initial) {
     return init_node(initial);
 }
 
@@ -75,7 +75,7 @@ static struct linked_list* find_last(const struct linked_list* list) {
     return cpy;
 }
 
-struct linked_list* list_insert_at_index(struct linked_list* list, size_t index, union parametric_datastructure_element element){
+struct linked_list* list_insert_at_index(struct linked_list* list, size_t index, union parametric_list_element element){
     struct linked_list* head = list;
 
     if (!list) {
@@ -101,47 +101,47 @@ struct linked_list* list_insert_at_index(struct linked_list* list, size_t index,
 }
 
 
-struct linked_list* list_push_back(struct linked_list* list, union parametric_datastructure_element element){
+struct linked_list* list_push_back(struct linked_list* list, union parametric_list_element element){
     struct linked_list* last = find_last(list);
     struct linked_list* new = init_node(element);
     last->next = new;
     new->next = NULL;
     return list;
 }
-struct linked_list* list_push_front(struct linked_list* list, union parametric_datastructure_element element) {
+struct linked_list* list_push_front(struct linked_list* list, union parametric_list_element element) {
     struct linked_list* new = init_node(element);
     new->next = list;
     return new;
 }
 
-struct pde_optional list_get_by_index(const struct linked_list* list, size_t index) {
+struct ple_optional list_get_by_index(const struct linked_list* list, size_t index) {
     if (!list) {
-        return PDE_EMPTY;
+        return PLE_EMPTY;
     }
 
     size_t iter = 0;
     while (list) {
         if (iter++ == index) {
-            return pde_of(list->value);
+            return ple_of(list->value);
         }
         list = list->next;
     }
 
-    return PDE_EMPTY;
+    return PLE_EMPTY;
 }
-struct pde_optional list_get_first(const struct linked_list* list) {
+struct ple_optional list_get_first(const struct linked_list* list) {
     if (!list) {
-        return PDE_EMPTY;
+        return PLE_EMPTY;
     }
 
-    return pde_of(list->value);
+    return ple_of(list->value);
 }
-struct pde_optional list_get_last(const struct linked_list* list){
+struct ple_optional list_get_last(const struct linked_list* list){
     if (!list) {
-        return PDE_EMPTY;
+        return PLE_EMPTY;
     }
 
-    return pde_of(find_last(list)->value);
+    return ple_of(find_last(list)->value);
 }
 
 struct linked_list* list_map(struct linked_list* list, list_map_function function){
@@ -161,7 +161,7 @@ struct linked_list* list_map(struct linked_list* list, list_map_function functio
 
     return new_head;
 }
-void list_for_each(struct linked_list* list, list_for_each_func func) {
+void list_for_each(const struct linked_list* list, list_for_each_func func) {
     if (!list) {
         return;
     }
@@ -171,3 +171,43 @@ void list_for_each(struct linked_list* list, list_for_each_func func) {
         list = list->next;
     }
 }
+
+void list_modifying_for_each(struct linked_list* list, list_modifying_for_each_func func, void* external_param) {
+    if (!list) {
+        return;
+    }
+
+    while (list) {
+        func(&list->value, external_param);
+        list = list->next;
+    }
+}
+
+bool list_any(struct linked_list* list, list_predicate_func func, void* external_param) {
+    if (!list) {
+        return false;
+    }
+
+    while(list) {
+        if (func(list->value, external_param)) {
+            return true;
+        }
+        list=list->next;
+    }
+    return false;
+}
+
+bool list_all(struct linked_list* list, list_predicate_func func, void* external_param) {
+    if (!list) {
+        return false;
+    }
+
+    while(list) {
+        if (!func(list->value, external_param)) {
+            return false;
+        }
+        list=list->next;
+    }
+    return true;
+}
+
